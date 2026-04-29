@@ -15,11 +15,11 @@ export default function MarketplacePage({ cat, addToCart }) {
     const fetchProducts = async () => {
       setLoading(true);
       try {
-        const records = await pb.collection('products').getFullList({
-          filter: `category.slug = "${cat}"`,
+        const allRecords = await pb.collection('products').getFullList({
           sort: '-created',
           expand: 'category'
         });
+        const records = allRecords.filter(r => r.expand?.category?.slug === cat || r.slug === cat);
         const mapped = records.map(r => ({
           id: r.id,
           cat: r.expand?.category?.name || (isFerreos ? 'Férreos' : 'Pinturas'),

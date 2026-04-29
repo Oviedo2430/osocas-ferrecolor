@@ -32,12 +32,16 @@ export default function ProductDetailPage({ addToCart }) {
         };
         setProduct(p);
 
-        // Fetch related
-        const relRecords = await pb.collection('products').getList(1, 4, {
-          filter: `category = "${r.category}" && id != "${p.id}"`,
-          expand: 'category'
+        // Fetch related locally to avoid PB filter syntax errors
+        const allRelRecords = await pb.collection('products').getList(1, 20, {
+          expand: 'category',
+          sort: '-created'
         });
-        setRelated(relRecords.items.map(rel => ({
+        const filteredRel = allRelRecords.items.filter(rel => 
+          rel.id !== p.id && rel.expand?.category?.id === r.category
+        ).slice(0, 4);
+        
+        setRelated(filteredRel.map(rel => ({
           id: rel.id,
           cat: rel.expand?.category?.name || 'Producto',
           name: rel.name,
