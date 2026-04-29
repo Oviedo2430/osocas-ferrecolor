@@ -17,35 +17,36 @@ export default function ProductDetailPage({ addToCart }) {
     const fetchProduct = async () => {
       setLoading(true);
       try {
-        const r = await pb.collection('products').getOne(id);
+        const r = await pb.collection('products').getOne(id, { expand: 'category' });
         const p = {
           id: r.id,
-          cat: r.category,
+          cat: r.expand?.category?.name || 'Producto',
           name: r.name,
           brand: r.brand,
           size: r.size,
           price: r.price,
           desc: r.description,
           specs: r.specs ? JSON.parse(r.specs) : [],
-          image: r.category === 'ferreos' ? 'ferreo' : 'pintura',
+          image: (r.expand?.category?.name || '').toLowerCase().includes('pintura') ? 'pintura' : 'ferreo',
           imageUrl: r.images && r.images.length > 0 ? pb.files.getUrl(r, r.images[0]) : null
         };
         setProduct(p);
 
         // Fetch related
         const relRecords = await pb.collection('products').getList(1, 4, {
-          filter: `category = "${p.cat}" && id != "${p.id}"`,
+          filter: `category = "${r.category}" && id != "${p.id}"`,
+          expand: 'category'
         });
         setRelated(relRecords.items.map(rel => ({
           id: rel.id,
-          cat: rel.category,
+          cat: rel.expand?.category?.name || 'Producto',
           name: rel.name,
           brand: rel.brand,
           size: rel.size,
           price: rel.price,
           desc: rel.description,
           specs: rel.specs ? JSON.parse(rel.specs) : [],
-          image: rel.category === 'ferreos' ? 'ferreo' : 'pintura',
+          image: (rel.expand?.category?.name || '').toLowerCase().includes('pintura') ? 'pintura' : 'ferreo',
           imageUrl: rel.images && rel.images.length > 0 ? pb.files.getUrl(rel, rel.images[0]) : null
         })));
       } catch (err) {

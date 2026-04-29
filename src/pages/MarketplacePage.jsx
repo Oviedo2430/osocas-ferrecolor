@@ -16,19 +16,20 @@ export default function MarketplacePage({ cat, addToCart }) {
       setLoading(true);
       try {
         const records = await pb.collection('products').getFullList({
-          filter: `category = "${cat}"`,
+          filter: `category.name ~ "${isFerreos ? 'Férreo' : 'Pintura'}" || slug = "${cat}"`,
           sort: '-created',
+          expand: 'category'
         });
         const mapped = records.map(r => ({
           id: r.id,
-          cat: r.category,
+          cat: r.expand?.category?.name || (isFerreos ? 'Férreos' : 'Pinturas'),
           name: r.name,
           brand: r.brand,
           size: r.size,
           price: r.price,
           desc: r.description,
           specs: r.specs ? JSON.parse(r.specs) : [],
-          image: r.category === 'ferreos' ? 'ferreo' : 'pintura',
+          image: (r.expand?.category?.name || '').toLowerCase().includes('pintura') ? 'pintura' : 'ferreo',
           imageUrl: r.images && r.images.length > 0 ? pb.files.getUrl(r, r.images[0]) : null
         }));
         setProducts(mapped);

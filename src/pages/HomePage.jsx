@@ -17,18 +17,19 @@ export default function HomePage() {
         // If not found, it will gracefully handle it
         const records = await pb.collection('products').getList(1, 8, {
           sort: '-created',
+          expand: 'category'
         });
         // We map pocketbase record to our local structure format
         const products = records.items.map(r => ({
           id: r.id,
-          cat: r.category,
+          cat: r.expand?.category?.name || 'Férreos',
           name: r.name,
           brand: r.brand,
           size: r.size,
           price: r.price,
           desc: r.description,
           specs: r.specs ? JSON.parse(r.specs) : [],
-          image: r.category === 'ferreos' ? 'ferreo' : 'pintura',
+          image: (r.expand?.category?.name || '').toLowerCase().includes('pintura') ? 'pintura' : 'ferreo',
           imageUrl: r.images && r.images.length > 0 ? pb.files.getUrl(r, r.images[0]) : null
         }));
         setFeaturedProducts(products);
