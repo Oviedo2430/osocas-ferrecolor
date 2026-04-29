@@ -16,7 +16,7 @@ export default function MarketplacePage({ cat, addToCart }) {
       setLoading(true);
       try {
         const records = await pb.collection('products').getFullList({
-          filter: `category.name ~ "${isFerreos ? 'Férreo' : 'Pintura'}" || slug = "${cat}"`,
+          filter: `category.slug = "${cat}"`,
           sort: '-created',
           expand: 'category'
         });
@@ -35,6 +35,7 @@ export default function MarketplacePage({ cat, addToCart }) {
         setProducts(mapped);
       } catch (err) {
         console.warn('Error fetching products:', err);
+        setErrorMsg(err.message || 'Error de conexión con PocketBase');
       } finally {
         setLoading(false);
       }
