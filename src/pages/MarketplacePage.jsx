@@ -35,7 +35,6 @@ export default function MarketplacePage({ cat, addToCart }) {
         setProducts(mapped);
       } catch (err) {
         console.warn('Error fetching products:', err);
-        setErrorMsg(err.message || 'Error de conexión con PocketBase');
       } finally {
         setLoading(false);
       }
