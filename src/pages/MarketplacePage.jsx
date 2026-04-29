@@ -16,7 +16,7 @@ export default function MarketplacePage({ cat, addToCart }) {
       setLoading(true);
       try {
         const [allRecords, categories] = await Promise.all([
-          pb.collection('products').getFullList({ sort: '-created' }),
+          pb.collection('products').getFullList(),
           pb.collection('categories').getFullList()
         ]);
         

@@ -13,7 +13,7 @@ export default function HomePage() {
     const fetchFeatured = async () => {
       try {
         const [records, categories] = await Promise.all([
-          pb.collection('products').getList(1, 8, { sort: '-created' }),
+          pb.collection('products').getList(1, 8),
           pb.collection('categories').getFullList()
         ]);
         

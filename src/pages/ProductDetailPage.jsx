@@ -20,7 +20,7 @@ export default function ProductDetailPage({ addToCart }) {
         const [r, categories, allRelRecords] = await Promise.all([
           pb.collection('products').getOne(id),
           pb.collection('categories').getFullList(),
-          pb.collection('products').getList(1, 20, { sort: '-created' })
+          pb.collection('products').getList(1, 20)
         ]);
         
         const catMap = {};
