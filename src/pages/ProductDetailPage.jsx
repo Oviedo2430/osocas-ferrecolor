@@ -17,42 +17,50 @@ export default function ProductDetailPage({ addToCart }) {
     const fetchProduct = async () => {
       setLoading(true);
       try {
-        const r = await pb.collection('products').getOne(id, { expand: 'category' });
+        const [r, categories, allRelRecords] = await Promise.all([
+          pb.collection('products').getOne(id),
+          pb.collection('categories').getFullList(),
+          pb.collection('products').getList(1, 20, { sort: '-created' })
+        ]);
+        
+        const catMap = {};
+        categories.forEach(c => catMap[c.id] = c);
+        const productCatObj = catMap[r.category];
+
         const p = {
           id: r.id,
-          cat: r.expand?.category?.name || 'Producto',
+          cat: productCatObj ? productCatObj.name : 'Producto',
           name: r.name,
           brand: r.brand,
           size: r.size,
           price: r.price,
           desc: r.description,
           specs: r.specs ? JSON.parse(r.specs) : [],
-          image: (r.expand?.category?.name || '').toLowerCase().includes('pintura') ? 'pintura' : 'ferreo',
+          image: (productCatObj ? productCatObj.name : '').toLowerCase().includes('pintura') ? 'pintura' : 'ferreo',
           imageUrl: r.images && r.images.length > 0 ? pb.files.getUrl(r, r.images[0]) : null
         };
         setProduct(p);
 
         // Fetch related locally to avoid PB filter syntax errors
-        const allRelRecords = await pb.collection('products').getList(1, 20, {
-          expand: 'category',
-          sort: '-created'
-        });
         const filteredRel = allRelRecords.items.filter(rel => 
-          rel.id !== p.id && rel.expand?.category?.id === r.category
+          rel.id !== p.id && rel.category === r.category
         ).slice(0, 4);
         
-        setRelated(filteredRel.map(rel => ({
-          id: rel.id,
-          cat: rel.expand?.category?.name || 'Producto',
-          name: rel.name,
-          brand: rel.brand,
-          size: rel.size,
-          price: rel.price,
-          desc: rel.description,
-          specs: rel.specs ? JSON.parse(rel.specs) : [],
-          image: (rel.expand?.category?.name || '').toLowerCase().includes('pintura') ? 'pintura' : 'ferreo',
-          imageUrl: rel.images && rel.images.length > 0 ? pb.files.getUrl(rel, rel.images[0]) : null
-        })));
+        setRelated(filteredRel.map(rel => {
+          const relCatObj = catMap[rel.category];
+          return {
+            id: rel.id,
+            cat: relCatObj ? relCatObj.name : 'Producto',
+            name: rel.name,
+            brand: rel.brand,
+            size: rel.size,
+            price: rel.price,
+            desc: rel.description,
+            specs: rel.specs ? JSON.parse(rel.specs) : [],
+            image: (relCatObj ? relCatObj.name : '').toLowerCase().includes('pintura') ? 'pintura' : 'ferreo',
+            imageUrl: rel.images && rel.images.length > 0 ? pb.files.getUrl(rel, rel.images[0]) : null
+          };
+        }));
       } catch (err) {
         console.warn('Error fetching product:', err);
       } finally {

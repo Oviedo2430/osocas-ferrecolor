@@ -15,23 +15,34 @@ export default function MarketplacePage({ cat, addToCart }) {
     const fetchProducts = async () => {
       setLoading(true);
       try {
-        const allRecords = await pb.collection('products').getFullList({
-          sort: '-created',
-          expand: 'category'
+        const [allRecords, categories] = await Promise.all([
+          pb.collection('products').getFullList({ sort: '-created' }),
+          pb.collection('categories').getFullList()
+        ]);
+        
+        const catMap = {};
+        categories.forEach(c => catMap[c.id] = c);
+
+        const records = allRecords.filter(r => {
+          const catObj = catMap[r.category];
+          return (catObj && catObj.slug === cat) || r.slug === cat;
         });
-        const records = allRecords.filter(r => r.expand?.category?.slug === cat || r.slug === cat);
-        const mapped = records.map(r => ({
-          id: r.id,
-          cat: r.expand?.category?.name || (isFerreos ? 'Férreos' : 'Pinturas'),
-          name: r.name,
-          brand: r.brand,
-          size: r.size,
-          price: r.price,
-          desc: r.description,
-          specs: r.specs ? JSON.parse(r.specs) : [],
-          image: (r.expand?.category?.name || '').toLowerCase().includes('pintura') ? 'pintura' : 'ferreo',
-          imageUrl: r.images && r.images.length > 0 ? pb.files.getUrl(r, r.images[0]) : null
-        }));
+
+        const mapped = records.map(r => {
+          const catObj = catMap[r.category];
+          return {
+            id: r.id,
+            cat: catObj ? catObj.name : (isFerreos ? 'Férreos' : 'Pinturas'),
+            name: r.name,
+            brand: r.brand,
+            size: r.size,
+            price: r.price,
+            desc: r.description,
+            specs: r.specs ? JSON.parse(r.specs) : [],
+            image: (catObj ? catObj.name : '').toLowerCase().includes('pintura') ? 'pintura' : 'ferreo',
+            imageUrl: r.images && r.images.length > 0 ? pb.files.getUrl(r, r.images[0]) : null
+          };
+        });
         setProducts(mapped);
       } catch (err) {
         console.warn('Error fetching products:', err);

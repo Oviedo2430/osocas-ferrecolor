@@ -12,26 +12,29 @@ export default function HomePage() {
     // Fetch some products from PocketBase to show on home page
     const fetchFeatured = async () => {
       try {
-        // Query products from pocketbase, limit to 8
-        // Assuming the collection is named 'products'
-        // If not found, it will gracefully handle it
-        const records = await pb.collection('products').getList(1, 8, {
-          sort: '-created',
-          expand: 'category'
+        const [records, categories] = await Promise.all([
+          pb.collection('products').getList(1, 8, { sort: '-created' }),
+          pb.collection('categories').getFullList()
+        ]);
+        
+        const catMap = {};
+        categories.forEach(c => catMap[c.id] = c);
+
+        const products = records.items.map(r => {
+          const catObj = catMap[r.category];
+          return {
+            id: r.id,
+            cat: catObj ? catObj.name : 'Férreos',
+            name: r.name,
+            brand: r.brand,
+            size: r.size,
+            price: r.price,
+            desc: r.description,
+            specs: r.specs ? JSON.parse(r.specs) : [],
+            image: (catObj ? catObj.name : '').toLowerCase().includes('pintura') ? 'pintura' : 'ferreo',
+            imageUrl: r.images && r.images.length > 0 ? pb.files.getUrl(r, r.images[0]) : null
+          };
         });
-        // We map pocketbase record to our local structure format
-        const products = records.items.map(r => ({
-          id: r.id,
-          cat: r.expand?.category?.name || 'Férreos',
-          name: r.name,
-          brand: r.brand,
-          size: r.size,
-          price: r.price,
-          desc: r.description,
-          specs: r.specs ? JSON.parse(r.specs) : [],
-          image: (r.expand?.category?.name || '').toLowerCase().includes('pintura') ? 'pintura' : 'ferreo',
-          imageUrl: r.images && r.images.length > 0 ? pb.files.getUrl(r, r.images[0]) : null
-        }));
         setFeaturedProducts(products);
       } catch (err) {
         console.warn('Could not fetch products, using empty array for now. Make sure the "products" collection exists and has public read access.', err);
