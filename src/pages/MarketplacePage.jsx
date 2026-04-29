@@ -28,7 +28,8 @@ export default function MarketplacePage({ cat, addToCart }) {
           price: r.price,
           desc: r.description,
           specs: r.specs ? JSON.parse(r.specs) : [],
-          image: r.category === 'ferreos' ? 'ferreo' : 'pintura'
+          image: r.category === 'ferreos' ? 'ferreo' : 'pintura',
+          imageUrl: r.images && r.images.length > 0 ? pb.files.getUrl(r, r.images[0]) : null
         }));
         setProducts(mapped);
       } catch (err) {

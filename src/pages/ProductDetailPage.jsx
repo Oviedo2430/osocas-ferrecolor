@@ -27,7 +27,8 @@ export default function ProductDetailPage({ addToCart }) {
           price: r.price,
           desc: r.description,
           specs: r.specs ? JSON.parse(r.specs) : [],
-          image: r.category === 'ferreos' ? 'ferreo' : 'pintura'
+          image: r.category === 'ferreos' ? 'ferreo' : 'pintura',
+          imageUrl: r.images && r.images.length > 0 ? pb.files.getUrl(r, r.images[0]) : null
         };
         setProduct(p);
 
@@ -44,7 +45,8 @@ export default function ProductDetailPage({ addToCart }) {
           price: rel.price,
           desc: rel.description,
           specs: rel.specs ? JSON.parse(rel.specs) : [],
-          image: rel.category === 'ferreos' ? 'ferreo' : 'pintura'
+          image: rel.category === 'ferreos' ? 'ferreo' : 'pintura',
+          imageUrl: rel.images && rel.images.length > 0 ? pb.files.getUrl(rel, rel.images[0]) : null
         })));
       } catch (err) {
         console.warn('Error fetching product:', err);
@@ -82,8 +84,12 @@ export default function ProductDetailPage({ addToCart }) {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(300px,1fr))', gap: 64 }}>
           {/* Image */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-            <div style={{ background: '#f8f8f8', borderRadius: 12, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '60px 40px', border: '2px solid #eee' }}>
-              <ProductImg type={product.image} size={200} />
+            <div style={{ background: '#f8f8f8', borderRadius: 12, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: product.imageUrl ? '0' : '60px 40px', border: '2px solid #eee', overflow: 'hidden' }}>
+              {product.imageUrl ? (
+                <img src={product.imageUrl} alt={product.name} style={{ width: '100%', height: 'auto', objectFit: 'contain', maxHeight: 400 }} />
+              ) : (
+                <ProductImg type={product.image} size={200} />
+              )}
             </div>
           </div>
 

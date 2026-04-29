@@ -19,8 +19,12 @@ export default function ProductCard({ product, onAdd }) {
   return (
     <div onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
       style={{ background: '#fff', borderRadius: 10, overflow: 'hidden', border: `2px solid ${hov ? '#CC0000' : '#eee'}`, transition: 'all .2s', boxShadow: hov ? '0 8px 32px rgba(204,0,0,0.1)' : '0 2px 8px rgba(0,0,0,0.05)', transform: hov ? 'translateY(-4px)' : 'none', display: 'flex', flexDirection: 'column' }}>
-      <Link to={`/product/${product.id}`} style={{ textDecoration: 'none', background: '#f8f8f8', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '28px 0', color: 'inherit' }}>
-        <ProductImg type={product.image} size={120} />
+      <Link to={`/product/${product.id}`} style={{ textDecoration: 'none', background: '#f8f8f8', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: product.imageUrl ? '0' : '28px 0', color: 'inherit', height: 180, overflow: 'hidden' }}>
+        {product.imageUrl ? (
+          <img src={product.imageUrl} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+        ) : (
+          <ProductImg type={product.image} size={120} />
+        )}
       </Link>
       <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', flex: 1 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
@@ -50,8 +54,12 @@ export function MiniProductCard({ product }) {
   return (
     <div onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
       style={{ background: '#262626', borderRadius: 8, overflow: 'hidden', border: `1px solid ${hov ? '#CC0000' : '#333'}`, transition: 'border-color .2s, transform .2s', transform: hov ? 'translateY(-3px)' : 'none', display: 'flex', flexDirection: 'column' }}>
-      <Link to={`/product/${product.id}`} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', background: '#222', padding: 16, textDecoration: 'none' }}>
-        <ProductImg type={product.image} size={90} />
+      <Link to={`/product/${product.id}`} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', background: '#222', padding: product.imageUrl ? '0' : '16px', textDecoration: 'none', height: 130, overflow: 'hidden' }}>
+        {product.imageUrl ? (
+          <img src={product.imageUrl} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+        ) : (
+          <ProductImg type={product.image} size={90} />
+        )}
       </Link>
       <div style={{ padding: '14px 16px', display: 'flex', flexDirection: 'column', flex: 1 }}>
         <div style={{ fontSize: 10, color: '#CC0000', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 4 }}>{product.brand}</div>

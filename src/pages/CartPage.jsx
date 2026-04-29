@@ -48,8 +48,12 @@ export default function CartPage({ cart, setCart }) {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             {cart.map(item => (
               <div key={item.id} style={{ background: '#fff', borderRadius: 10, padding: '20px', display: 'flex', gap: 20, alignItems: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', flexWrap: 'wrap' }}>
-                <div style={{ background: '#f8f8f8', borderRadius: 8, padding: 12, flexShrink: 0 }}>
-                  <ProductImg type={item.image} size={70} />
+                <div style={{ background: '#f8f8f8', borderRadius: 8, padding: item.imageUrl ? 0 : 12, flexShrink: 0, width: 70, height: 70, overflow: 'hidden', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                  {item.imageUrl ? (
+                    <img src={item.imageUrl} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  ) : (
+                    <ProductImg type={item.image} size={70} />
+                  )}
                 </div>
                 <div style={{ flex: 1, minWidth: 150 }}>
                   <div style={{ fontSize: 11, color: '#CC0000', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1 }}>{item.brand}</div>
