@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, ScrollRestoration } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import HomePage from './pages/HomePage';
 import MarketplacePage from './pages/MarketplacePage';
@@ -22,7 +22,6 @@ function App() {
 
   return (
     <Router>
-      <ScrollRestoration />
       <Navbar cart={cart} />
       <Routes>
         <Route path="/" element={<HomePage />} />
