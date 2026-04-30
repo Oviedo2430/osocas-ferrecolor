@@ -38,7 +38,7 @@ export default function MarketplacePage({ cat, addToCart }) {
             size: r.size,
             price: r.price,
             desc: r.description,
-            specs: r.specs ? JSON.parse(r.specs) : [],
+            specs: (() => { try { return r.specs ? JSON.parse(r.specs) : []; } catch(e) { return []; } })(),
             image: (catObj ? catObj.name : '').toLowerCase().includes('pintura') ? 'pintura' : 'ferreo',
             imageUrl: r.images && r.images.length > 0 ? pb.files.getUrl(r, r.images[0]) : null
           };
